@@ -10,7 +10,7 @@ const Note = require('../models/note');
 
 // mongoose.connect(MONGODB_URI)
 //   .then(()=>{
-//     const id = '000000000000000000000003';
+//     const id = '000000000000000000000004';
 
 //     return Note.findByIdAndRemove(id);
 //   })
@@ -124,32 +124,32 @@ const Note = require('../models/note');
 
 // Find/Search for notes (with mini challenge that searches both title and content:
 
-mongoose.connect(MONGODB_URI)
-  .then(() => {
-    const searchContent = 'Lorem';
-    let filter1 = {};
-    let filter2={};
+// mongoose.connect(MONGODB_URI)
+//   .then(() => {
+//     const searchContent = 'Lorem';
+//     let filter1 = {};
+//     let filter2={};
 
-    if (searchContent) {
-      const re = new RegExp(searchContent, 'i');
-      filter1.title = { $regex: re };
-      filter2.content = { $regex: re };
-    }
+//     if (searchContent) {
+//       const re = new RegExp(searchContent, 'i');
+//       filter1.title = { $regex: re };
+//       filter2.content = { $regex: re };
+//     }
 
-    return Note.find({$or:[filter1, filter2]})
-      .sort('created')
-      .then(results => {
-        console.log(results);
-      })
-      .catch(console.error);
-  })
-  .then(() => {
-    return mongoose.disconnect()
-      .then(() => {
-        console.info('Disconnected');
-      });
-  })
-  .catch(err => {
-    console.error(`ERROR: ${err.message}`);
-    console.error(err);
-  });
+//     return Note.find({$or:[filter1, filter2]})
+//       .sort('created')
+//       .then(results => {
+//         console.log(results);
+//       })
+//       .catch(console.error);
+//   })
+//   .then(() => {
+//     return mongoose.disconnect()
+//       .then(() => {
+//         console.info('Disconnected');
+//       });
+//   })
+//   .catch(err => {
+//     console.error(`ERROR: ${err.message}`);
+//     console.error(err);
+//   });
