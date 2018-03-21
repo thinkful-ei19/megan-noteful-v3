@@ -1,7 +1,11 @@
 language: node_js
 node_js: node
-env:
-  - NODE_ENV=test
+services:
+  - mongodb
+
+
+# env:
+#   - NODE_ENV=test
 # services:
 #   - [DATABASE-TYPE]  
 # deploy:

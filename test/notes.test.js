@@ -44,6 +44,33 @@ describe('start, seed, do tests, disconnect', function() {
           expect(res.body).to.have.length(data.length);
         });
     });
+
+
+    it('should return the correct notes for a searchTerm query', function () {
+      const searchContent = 'cats';
+      let filter1 = {};
+      let filter2={};
+
+      if (searchContent) {
+        const re = new RegExp(searchContent, 'i');
+        filter1.title = { $regex: re };
+        filter2.content = { $regex: re };
+      }
+      const dbPromise = Note.find({$or: [filter1, filter2]});
+      const apiPromise = chai.request(app).get(`/api/notes?searchTerm=${searchContent}`);
+
+      return Promise.all([dbPromise, apiPromise])
+        .then(([data, res]) => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('array');
+          expect(res.body).to.have.length(8);
+          expect(res.body[0]).to.be.an('object');
+          expect(res.body[0].id).to.equal(data[0].id);
+        });
+    });
+
+
   });
 
   //Get notes by ID:
@@ -70,6 +97,15 @@ describe('start, seed, do tests, disconnect', function() {
           expect(res.body.content).to.equal(data.content);
         });
     });
+
+    // it('should respond with a 404 for bad ID', function(){
+    //   return chai.request(app).get('/api/notes/9')
+    //     .then(res=>{
+    //       expect(res).to.have.status(404);
+    //     });
+
+    // });
+
   });  
 
   //Post/Create Notes:
@@ -101,9 +137,26 @@ describe('start, seed, do tests, disconnect', function() {
           expect(body.content).to.equal(data.content);
         });
     });
+
+    it('should return an error when missing "title" field', function () {
+      const updateItem = {
+        'foo': 'bar'
+      };
+
+      return chai.request(app)
+        .post('/api/notes')
+        .send(updateItem)
+        .catch(err => err.response)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body.message).to.equal('Missing title in request body');
+        });
+    });
   });
 
-
+  //Put/Update Notes based on ID:
   describe('PUT api/notes/:id', function(){
     
     
@@ -133,30 +186,71 @@ describe('start, seed, do tests, disconnect', function() {
           expect(data.id).to.equal(body.id);
         });
     });
+
+
+    it('should return an error when missing "title" field', function () {
+      const updateItem = {
+        'foo': 'bar'
+      };
+
+      return chai.request(app)
+        .put('/api/notes/000000000000000000000000')
+        .send(updateItem)
+        .catch(err => err.response)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body.message).to.equal('Missing `title` in request body');
+        });
+    });
+
+    it('should respond with a 404 for bad ID', function(){
+      const updateNote = {
+        'title': 'What about dogs?!',
+        'content': 'woof woof',
+        'tags': []
+      };
+      return chai.request(app).put('/api/notes/9').send(updateNote)
+        .catch(err=>err.response)
+        .then(res=>{
+          expect(res).to.have.status(404);
+        });
+
+    });
+
   });
 
 
   //Delete Notes by ID:
   describe('DELETE api/notes/:id', function(){
-    it('should delete the note based on its ID', function(){
-      let beforeDelete;
-      return Note.findById({_id:'000000000000000000000000'})
-        .then(res=>{
-          beforeDelete = res;
-          return chai.request(app).delete('/api/notes/000000000000000000000000');
-        })
-        .then(data=>{
-          expect(data).to.have.status(204);
-          return Note.findById({_id:'000000000000000000000000'});
-        })
-        .then(result=>{
-          console.log(result);
-          expect(beforeDelete).to.not.equal(result);
-          expect(result).to.be.null;          
+    // it('should delete the note based on its ID', function(){
+    //   let beforeDelete;
+    //   return Note.findById({_id:'000000000000000000000001'})
+    //     .then(res=>{
+    //       beforeDelete = res;
+    //       return chai.request(app).delete('/api/notes/000000000000000000000001');
+    //     })
+    //     .then(data=>{
+    //       expect(data).to.have.status(204);
+    //       return Note.findById({_id:'000000000000000000000001'});
+    //     })
+    //     .then(result=>{
+    //       console.log(result);
+    //       expect(beforeDelete).to.not.equal(result);
+    //       expect(result).to.be.null;          
+    //     });
+    // });
+
+    it('should respond with a 404 for a bad id', function () {
+
+      return chai.request(app)
+        .delete('/api/notes/9')
+        .catch(err => err.response)
+        .then(res => {
+          expect(res).to.have.status(404);
         });
     });
-
-
 
   });
 

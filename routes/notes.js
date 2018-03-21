@@ -2,6 +2,7 @@
 
 const express = require('express');
 const Note = require('../models/note');
+const mongoose = require('mongoose');
 
 // Create an router instance (aka "mini-app")
 const router = express.Router();
@@ -39,6 +40,12 @@ router.get('/notes/:id', (req, res, next) => {
 
   if(id){
     filter._id= id;
+  }
+
+  if(!mongoose.Types.ObjectId.isValid(id)){
+    const err = new Error('ID is not valid');
+    err.status = 404;
+    return next(err);
   }
 
   Note.findById(filter)
@@ -95,10 +102,23 @@ router.put('/notes/:id', (req, res, next) => {
     toChange.title = title;
     toChange.content = content;
   }
+  if (!toChange.title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
+  
+  if(!mongoose.Types.ObjectId.isValid(id)){
+    const err = new Error('ID is not valid');
+    err.status = 404;
+    return next(err);
+  }
 
   Note.findByIdAndUpdate(id, toChange, {upsert:true, new:true})
     
-    .then(results=>res.json(results))
+    .then(results=>{
+      res.json(results);
+    })
     .catch(err=> next(err));
 
 });
@@ -108,9 +128,15 @@ router.delete('/notes/:id', (req, res, next) => {
 
   const id = req.params.id;
 
+  if(!mongoose.Types.ObjectId.isValid(id)){
+    const err = new Error('ID is not valid');
+    err.status = 404;
+    return next(err);
+  }
+
   Note.findByIdAndRemove(id)
     
-    .then(results=> res.status(204).end())
+    .then(res=> res.status(204).end())
     .catch(err=>next(err));
 
 });
