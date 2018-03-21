@@ -1,7 +1,6 @@
 'use strict';
 
 const express = require('express');
-const mongoose = require('mongoose');
 const Note = require('../models/note');
 
 // Create an router instance (aka "mini-app")
@@ -58,6 +57,12 @@ router.post('/notes', (req, res, next) => {
   const newContent = req.body.content;
   const newEntry = {};
 
+  if(!newTitle){
+    const error = new Error('Missing title in request body');
+    error.status=400;
+    return next(error);
+  }
+
   if(newTitle){
     newEntry.title = newTitle;
   }
@@ -68,8 +73,12 @@ router.post('/notes', (req, res, next) => {
 
   Note.create(newEntry)
     
-    .then(results=> res.location(`${req.originalUrl}/${results.id}`).status(201).json(results))
-    .catch(err=>next(err));
+    .then(results=> {
+      res.location(`${req.originalUrl}/${results.id}`).status(201).json(results);
+    })
+    .catch(err=>{
+      next(err);
+    });
 
 });
 

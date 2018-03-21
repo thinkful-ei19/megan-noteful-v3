@@ -4,15 +4,13 @@ const mongoose= require('mongoose');
 
 
 const noteSchema = new mongoose.Schema({
-  title: { type: String, index: true },
-  content: { type: String, index: true },
-  created: { type: Date},
+  title: { type: String },
+  content: { type: String },
+  created: { type: Date, default: Date.now },
 });
   
-noteSchema.index({ title: 'text',  content: 'text'});
+//noteSchema.index({ title: 'text',  content: 'text'});
 
-
-//what does this do exactly?//What is a ret? Is it a return? (Mentor help)
 noteSchema.set('toObject', {
   transform: function (doc, ret) {
     ret.id = ret._id;
