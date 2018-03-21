@@ -136,8 +136,8 @@ router.delete('/notes/:id', (req, res, next) => {
 
   Note.findByIdAndRemove(id)
     
-    .then(res=> res.status(204).end())
-    .catch(err=>next(err));
+    .then(()=> res.status(204).end())
+    .catch(err => {console.error(err); res.sendStatus(500);});
 
 });
 

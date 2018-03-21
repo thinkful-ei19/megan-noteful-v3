@@ -224,23 +224,23 @@ describe('start, seed, do tests, disconnect', function() {
 
   //Delete Notes by ID:
   describe('DELETE api/notes/:id', function(){
-    // it('should delete the note based on its ID', function(){
-    //   let beforeDelete;
-    //   return Note.findById({_id:'000000000000000000000001'})
-    //     .then(res=>{
-    //       beforeDelete = res;
-    //       return chai.request(app).delete('/api/notes/000000000000000000000001');
-    //     })
-    //     .then(data=>{
-    //       expect(data).to.have.status(204);
-    //       return Note.findById({_id:'000000000000000000000001'});
-    //     })
-    //     .then(result=>{
-    //       console.log(result);
-    //       expect(beforeDelete).to.not.equal(result);
-    //       expect(result).to.be.null;          
-    //     });
-    // });
+    it('should delete the note based on its ID', function(){
+      let beforeDelete;
+      return Note.findById({_id:'000000000000000000000001'})
+        .then(res=>{
+          beforeDelete = res;
+          return chai.request(app).delete('/api/notes/000000000000000000000001');
+        })
+        .then(data=>{
+          expect(data).to.have.status(204);
+          return Note.findById({_id:'000000000000000000000001'});
+        })
+        .then(result=>{
+          console.log(result);
+          expect(beforeDelete).to.not.equal(result);
+          expect(result).to.be.null;          
+        });
+    });
 
     it('should respond with a 404 for a bad id', function () {
 
